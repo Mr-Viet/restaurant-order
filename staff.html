@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quản lý bàn</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Quản lý bàn</h1>
+
+<div id="tables"></div>
+
+<script>
+
+function loadTables() {
+
+fetch("/tables")
+.then(res => res.json())
+.then(data => {
+
+const div = document.getElementById("tables");
+
+div.innerHTML = "";
+
+Object.keys(data).forEach(table => {
+
+const btn = document.createElement("button");
+
+btn.innerText = table + " (" + data[table].length + " món)";
+
+btn.onclick = () => showTable(table);
+
+div.appendChild(btn);
+
+});
+
+});
+
+}
+
+function showTable(table){
+
+fetch("/table/"+table)
+.then(res=>res.json())
+.then(items=>{
+
+let text="";
+
+items.forEach(i=>{
+text+=i.name+"<br>";
+});
+
+if(confirm("Bàn "+table+"\n"+text+"\nThanh toán?")){
+
+fetch("/pay",{
+method:"POST",
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({table:table})
+}).then(()=>loadTables());
+
+}
+
+});
+
+}
+
+setInterval(loadTables,2000);
+
+loadTables();
+
+</script>
+
+</body>
+</html>

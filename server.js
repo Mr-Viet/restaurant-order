@@ -1,43 +1,42 @@
-const express = require("express")
-const app = express()
+const express = require("express");
+const app = express();
 
-app.use(express.json())
-app.use(express.static("public"))
+app.use(express.json());
+app.use(express.static(__dirname));
 
-let orders = {}
+let orders = {};
 
-app.post("/order",(req,res)=>{
+// khách gửi order
+app.post("/order", (req, res) => {
+  const { table, items } = req.body;
 
-const {table,items} = req.body
+  if (!orders[table]) {
+    orders[table] = [];
+  }
 
-orders[table] = items
+  orders[table] = orders[table].concat(items);
 
-res.json({status:"ok"})
+  res.json({ status: "ok" });
+});
 
-})
+// lấy danh sách bàn
+app.get("/tables", (req, res) => {
+  res.json(orders);
+});
 
-app.get("/tables",(req,res)=>{
+// lấy món của bàn
+app.get("/table/:id", (req, res) => {
+  res.json(orders[req.params.id] || []);
+});
 
-res.json(orders)
+// thanh toán
+app.post("/pay", (req, res) => {
+  delete orders[req.body.table];
+  res.json({ status: "paid" });
+});
 
-})
+const PORT = process.env.PORT || 3000;
 
-app.get("/table/:id",(req,res)=>{
-
-res.json(orders[req.params.id] || [])
-
-})
-
-app.post("/pay",(req,res)=>{
-
-delete orders[req.body.table]
-
-res.json({status:"paid"})
-
-})
-
-app.listen(3000,()=>{
-
-console.log("Server running on port 3000")
-
-})
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});

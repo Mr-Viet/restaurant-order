@@ -1,1 +1,9 @@
-﻿
+﻿body{
+font-family:Arial;
+padding:20px;
+}
+
+button{
+padding:10px;
+margin:5px;
+}
