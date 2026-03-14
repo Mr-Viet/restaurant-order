@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <title>Quản lý bàn</title>
@@ -8,29 +9,31 @@
 
 <body>
 
-<h1>Quản lý bàn</h1>
+<h1>Sơ đồ bàn</h1>
 
 <div id="tables"></div>
 
 <script>
 
-function loadTables() {
+function loadTables(){
 
 fetch("/tables")
-.then(res => res.json())
-.then(data => {
 
-const div = document.getElementById("tables");
+.then(res=>res.json())
 
-div.innerHTML = "";
+.then(data=>{
 
-Object.keys(data).forEach(table => {
+const div=document.getElementById("tables");
 
-const btn = document.createElement("button");
+div.innerHTML="";
 
-btn.innerText = table + " (" + data[table].length + " món)";
+Object.keys(data).forEach(table=>{
 
-btn.onclick = () => showTable(table);
+const btn=document.createElement("button");
+
+btn.innerText=table+" ("+data[table].length+" món)";
+
+btn.onclick=()=>showTable(table);
 
 div.appendChild(btn);
 
@@ -43,22 +46,27 @@ div.appendChild(btn);
 function showTable(table){
 
 fetch("/table/"+table)
+
 .then(res=>res.json())
+
 .then(items=>{
 
 let text="";
 
 items.forEach(i=>{
-text+=i.name+"<br>";
+text+=i.name+"\\n";
 });
 
-if(confirm("Bàn "+table+"\n"+text+"\nThanh toán?")){
+if(confirm("Bàn "+table+"\\n"+text+"\\nThanh toán?")){
 
 fetch("/pay",{
 method:"POST",
-headers:{'Content-Type':'application/json'},
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({table:table})
-}).then(()=>loadTables());
+})
+.then(()=>loadTables());
 
 }
 
