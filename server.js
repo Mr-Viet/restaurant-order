@@ -4,16 +4,25 @@ const path = require("path");
 const app = express();
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+
+// thư mục chứa file web
+const publicPath = path.join(__dirname);
+
+app.use(express.static(publicPath));
 
 let orders = {};
 
-// trang chủ
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "menu.html"));
+// trang menu
+app.get("/menu.html", (req, res) => {
+  res.sendFile(path.join(publicPath, "menu.html"));
 });
 
-// khách gửi order
+// trang staff
+app.get("/staff.html", (req, res) => {
+  res.sendFile(path.join(publicPath, "staff.html"));
+});
+
+// gửi order
 app.post("/order", (req, res) => {
 
   const { table, items } = req.body;
@@ -24,28 +33,28 @@ app.post("/order", (req, res) => {
 
   orders[table] = orders[table].concat(items);
 
-  res.json({status:"ok"});
+  res.json({ status: "ok" });
 
 });
 
-// lấy danh sách bàn
-app.get("/tables",(req,res)=>{
+// danh sách bàn
+app.get("/tables", (req, res) => {
   res.json(orders);
 });
 
-// lấy món của bàn
-app.get("/table/:id",(req,res)=>{
+// món từng bàn
+app.get("/table/:id", (req, res) => {
   res.json(orders[req.params.id] || []);
 });
 
 // thanh toán
-app.post("/pay",(req,res)=>{
+app.post("/pay", (req, res) => {
   delete orders[req.body.table];
-  res.json({status:"paid"});
+  res.json({ status: "paid" });
 });
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT,()=>{
-  console.log("Server running on port "+PORT);
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
