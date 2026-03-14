@@ -1,40 +1,42 @@
 const express = require("express");
+const path = require("path");
 const app = express();
 
 app.use(express.json());
-app.use(express.static(__dirname));
 
+// Phục vụ các file tĩnh (menu.html, staff.html, style.css, script.js...)
+app.use(express.static(path.join(__dirname)));
+
+// ====== Dữ liệu tạm (trong RAM) ======
 let orders = {};
 
-// khách gửi order
+// Khách gửi order
 app.post("/order", (req, res) => {
   const { table, items } = req.body;
 
-  if (!orders[table]) {
-    orders[table] = [];
-  }
-
+  if (!orders[table]) orders[table] = [];
   orders[table] = orders[table].concat(items);
 
   res.json({ status: "ok" });
 });
 
-// lấy danh sách bàn
+// Lấy tất cả bàn
 app.get("/tables", (req, res) => {
   res.json(orders);
 });
 
-// lấy món của bàn
+// Lấy món của 1 bàn
 app.get("/table/:id", (req, res) => {
   res.json(orders[req.params.id] || []);
 });
 
-// thanh toán
+// Thanh toán
 app.post("/pay", (req, res) => {
   delete orders[req.body.table];
   res.json({ status: "paid" });
 });
 
+// ====== Chạy server ======
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
